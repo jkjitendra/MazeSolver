@@ -1,0 +1,90 @@
+name: Build & Release Installers (auto-version)
+
+on:
+  push:
+    branches: [ main ]      # change if your default branch is different
+  workflow_dispatch:
+
+permissions:
+  contents: write           # needed to create tags/releases
+
+jobs:
+  prepare:
+    name: Read version & create tag if missing
+    runs-on: ubuntu-latest
+    outputs:
+      version: ${{ steps.getver.outputs.version }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+          cache: gradle
+
+      - id: getver
+        name: Read Gradle project version
+        run: echo "version=$(./gradlew -q printVersion)" >> "$GITHUB_OUTPUT"
+
+      - name: Create git tag v${{ steps.getver.outputs.version }} if it doesn't exist
+        run: |
+          TAG="v${{ steps.getver.outputs.version }}"
+          if git rev-parse "$TAG" >/dev/null 2>&1; then
+            echo "Tag $TAG already exists."
+          else
+            git config user.name "github-actions"
+            git config user.email "actions@github.com"
+            git tag "$TAG"
+            git push origin "$TAG"
+          fi
+
+  build:
+    name: Build on ${{ matrix.os }}
+    needs: prepare
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # helpful for jpackage metadata, not strictly required
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+          cache: gradle
+
+      - name: Build native package for current OS
+        run: ./gradlew --no-daemon packageCurrentOS
+
+      - name: Upload installers
+        uses: actions/upload-artifact@v4
+        with:
+          name: MazeSolver-${{ runner.os }}
+          path: |
+            build/dist/**/*
+
+  release:
+    name: Create GitHub Release and upload assets
+    needs: [prepare, build]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download all artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: dist
+
+      - name: Publish GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: v${{ needs.prepare.outputs.version }}
+          name: MazeSolver v${{ needs.prepare.outputs.version }}
+          files: dist/**/*  # attaches DMG/MSI/DEB/RPM

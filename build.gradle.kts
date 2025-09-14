@@ -238,3 +238,8 @@ tasks.register<JavaExec>("renderScreenshot") {
     // jvmArgs("-Djava.awt.headless=true")
     jvmArgs("-Djava.awt.headless=false")
 }
+
+// Prints the project version with no extra text (used by CI)
+tasks.register("printVersion") {
+    doLast { println(project.version.toString()) }
+}
