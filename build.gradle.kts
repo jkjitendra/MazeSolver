@@ -1,7 +1,5 @@
 import org.gradle.internal.os.OperatingSystem
 import org.gradle.jvm.tasks.Jar
-import org.gradle.api.tasks.JavaExec
-import org.gradle.api.tasks.SourceSetContainer
 
 plugins {
     application
@@ -218,25 +216,6 @@ tasks.register("packageCurrentOS") {
             else -> "createRuntime"
         }
     )
-}
-
-
-// Make sure docs/ exists (so the task can write there)
-val docsDir = layout.projectDirectory.dir("docs").asFile
-tasks.register("ensureDocsDir") {
-    doLast { if (!docsDir.exists()) docsDir.mkdirs() }
-}
-
-val sourceSets = the<SourceSetContainer>()
-
-tasks.register<JavaExec>("renderScreenshot") {
-    dependsOn("classes", "ensureDocsDir")
-    mainClass.set("com.drostwades.mazesolver.MazeSolverUI")
-    classpath = sourceSets.named("main").get().runtimeClasspath
-    args("--screenshot", layout.projectDirectory.file("docs/dashboard.png").asFile.absolutePath, "6")
-    // Remove this line or set to false:
-    // jvmArgs("-Djava.awt.headless=true")
-    jvmArgs("-Djava.awt.headless=false")
 }
 
 // Prints the project version with no extra text (used by CI)

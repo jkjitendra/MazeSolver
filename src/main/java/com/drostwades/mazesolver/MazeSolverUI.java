@@ -1,10 +1,5 @@
 package com.drostwades.mazesolver;
 
-import javax.imageio.ImageIO;
-import java.awt.image.BufferedImage;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-
 import javax.swing.*;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
@@ -270,16 +265,6 @@ public class MazeSolverUI extends JFrame {
 
     // ---- Startup: ask user for n, then build UI ----
     public static void main(String[] args) {
-
-        // Headless screenshot mode:
-        if (args.length >= 2 && "--screenshot".equals(args[0])) {
-            Path out = Paths.get(args[1]);
-            // pick a nice default n
-            int n = 6;
-            try { if (args.length >= 3) n = Integer.parseInt(args[2]); } catch (Exception ignored) {}
-            renderScreenshot(out, n);
-            return;
-        }
 
         // Normal interactive mode:
         SwingUtilities.invokeLater(() -> {
@@ -1045,28 +1030,5 @@ public class MazeSolverUI extends JFrame {
         if ("0".equals(g[0][0])) g[0][0] = "1";
         if ("0".equals(g[n-1][n-1])) g[n-1][n-1] = "1";
         return g;
-    }
-
-    /** Render the UI (sample grid) to a PNG and exit. Used for docs/automation. */
-    private static void renderScreenshot(Path out, int n) {
-        try {
-            MazeSolverUI ui = new MazeSolverUI(n);
-            ui.setVisible(false);                 // <-- add this
-            ui.setLocation(-10000, -10000);       // <-- off-screen, just in case
-            ui.onLoadSample(new ActionEvent(ui, ActionEvent.ACTION_PERFORMED, "sample"));
-            ui.pack();
-            ui.setSize(1200, 800);
-
-            BufferedImage img = new BufferedImage(ui.getWidth(), ui.getHeight(), BufferedImage.TYPE_INT_ARGB);
-            Graphics2D g2 = img.createGraphics();
-            ui.getContentPane().paint(g2);
-            g2.dispose();
-            ImageIO.write(img, "png", out.toFile());
-            ui.dispose();
-            System.out.println("Wrote screenshot → " + out.toAbsolutePath());
-        } catch (Exception ex) {
-            ex.printStackTrace();
-            System.exit(2);
-        }
     }
 }
