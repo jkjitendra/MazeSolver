@@ -29,7 +29,7 @@
 ### Build from Source
 
 ```bash
-    git clone https://github.com/your-username/MazeSolver.git
+    git clone https://github.com/jkjitendra/MazeSolver.git
     cd MazeSolver
     ./gradlew clean build shadowJar
 ```
