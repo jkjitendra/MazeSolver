@@ -8,7 +8,12 @@ plugins {
 }
 
 group = "com.drostwades"
-version = "1.0.0"
+val gitTag = System.getenv("GITHUB_REF_NAME")
+version = if (gitTag != null && gitTag.startsWith("v")) {
+    gitTag.substring(1)
+} else {
+    "1.0.0"
+}
 
 repositories { mavenCentral() }
 
