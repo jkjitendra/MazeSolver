@@ -155,7 +155,7 @@ tasks.register<Exec>("jpackageMac") {
         add(jpackageBin)
         addAll(commonArgs(outDir))
         addAll(listOf("--type", "dmg"))
-        val icns = iconsDir.file("app.icns").asFile
+        val icns = iconsDir.file("mathmaze.icns").asFile
         if (icns.exists()) addAll(listOf("--icon", icns.absolutePath))
     }
     commandLine(args)
@@ -170,7 +170,7 @@ tasks.register<Exec>("jpackageWin") {
         add(jpackageBin)
         addAll(commonArgs(outDir))
         addAll(listOf("--type", "msi", "--win-dir-chooser", "--win-menu", "--win-shortcut"))
-        val ico = iconsDir.file("app.ico").asFile
+        val ico = iconsDir.file("mathmaze.ico").asFile
         if (ico.exists()) addAll(listOf("--icon", ico.absolutePath))
     }
     commandLine(args)
@@ -185,7 +185,7 @@ tasks.register<Exec>("jpackageDeb") {
         add(jpackageBin)
         addAll(commonArgs(outDir))
         addAll(listOf("--type", "deb"))
-        val png = iconsDir.file("app.png").asFile
+        val png = iconsDir.file("mathmaze.png").asFile
         if (png.exists()) addAll(listOf("--icon", png.absolutePath))
     }
     commandLine(args)
@@ -200,7 +200,7 @@ tasks.register<Exec>("jpackageRpm") {
         add(jpackageBin)
         addAll(commonArgs(outDir))
         addAll(listOf("--type", "rpm"))
-        val png = iconsDir.file("app.png").asFile
+        val png = iconsDir.file("mathmaze.png").asFile
         if (png.exists()) addAll(listOf("--icon", png.absolutePath))
     }
     commandLine(args)
